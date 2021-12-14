@@ -25,7 +25,7 @@ async def on_message(message):
     msg = message.content
     if msg.startswith("!start"):
         if running==False:
-            await message.channel.send("Starting Skoolkraft SMP. ")
+            await message.channel.send("Starting Server. ")
             server_thread=threading.Thread(target=server)
             server_thread.daemon = True
             server_thread.start()
