@@ -1,6 +1,5 @@
-# minecraft-server-discord-bot
-Start a Minecraft server on your machine from a Discord bot!
-Do you want to have the ability to start a Minecraft server on your machine from a Discord bot? This simple script will help you do just that!
+# Overview
+Do you want to be able to start a Minecraft server on your machine from a Discord bot? This simple script will help you do just that!
 
 # Features
 The commands `!start`and `!check` are available to use. They start and check the status of the server, respectively. 
