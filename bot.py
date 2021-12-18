@@ -1,18 +1,39 @@
+import configparser
 import discord
 import os
 import threading
 import time
+from mcrcon import MCRcon
 
+running = False
 mcHost = discord.Client()
-token = ""
-running=False
+config = configparser.ConfigParser()
+config.read('env.b')
+token = config['BOT']['BOT_TOKEN']
+rcon_ip = config['RCON']['RCON_IP']
+rcon_pass = config['RCON']['RCON_PASS']
 
 def server():
     global running
-    os.system(r"")
+    running = True
+    os.system(r"run.bat")
+    running = False
     time.sleep(1)
-    running=False
-    print ("Server stopped. ")
+    print("Server stopped. ")
+
+def rcon_stop():
+    mcr = MCRcon(rcon_ip, rcon_pass)
+    mcr.connect()
+    mcr.command("execute unless entity @a run stop")
+    mcr.disconnect()
+
+def shutdown():
+    time.sleep(120)
+    print("Auto shutdown started. ")
+    while running:
+        print("Attempting auto shutdown... ")
+        rcon_stop()
+        time.sleep(180)
 
 @mcHost.event
 async def on_ready():
@@ -21,19 +42,28 @@ async def on_ready():
 
 @mcHost.event
 async def on_message(message):
-    global running
     msg = message.content
-    if msg.startswith("!start"):
-        if running==False:
-            await message.channel.send("Starting Server. ")
-            server_thread=threading.Thread(target=server)
-            server_thread.daemon = True
-            server_thread.start()
-            running=True
-            print("Server started")
-        else:
+    if msg.startswith("$start"):
+        if running:
             await message.channel.send("Server is already running! ")
-    if msg.startswith("!check"):
+        else:
+            await message.channel.send("Starting server. ")
+            print("Server started. ")
+            start_thread = threading.Thread(target=server)
+            stop_thread = threading.Thread(target=shutdown)
+            start_thread.start()
+            stop_thread.start()
+    if msg.startswith("$stop"):
+        if running:
+            await message.channel.send("Stopping server. ")
+            print("Attempting manual shutdown... ")
+            rcon_stop()
+        else:
+            await message.channel.send("Server is already down. ")
+    if msg.startswith("$check"):
         await message.channel.send("Server running: "+str(running))
+    if msg.startswith("$help"):
+        await message.channel.send("Use $start to start the server, and $stop to stop it. ")
+        await message.channel.send("Use $check to check the server status. ")
 
 mcHost.run(token)
