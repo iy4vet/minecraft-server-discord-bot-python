@@ -20,7 +20,7 @@ Go to https://discord.com/developers, and create a new application. Now go to th
 If you haven't already, set up your Minecraft server on your machine. Open the "server.properties" file. Change the parameters as shown below:
 1. `rcon.port=25575`
 2. `enable-rcon=true`
-3. `rcon.password=<password>`, where <password> is the password you wish to use. If you don't see these parameters, simply add them at the bottom of the file. 
+3. `rcon.password=<password>`, where \<password> is the password you wish to use. If you don't see these parameters, simply add them at the bottom of the file. 
 Rename your launch script to "run.bat". 
 
 ## Setting up the bot script
