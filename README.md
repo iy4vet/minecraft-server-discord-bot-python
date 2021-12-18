@@ -24,6 +24,6 @@ If you haven't already, set up your Minecraft server on your machine. Open the "
 Rename your launch script to "run.bat". 
 
 ## Setting up the bot script
-Open command prompt and run "pip install mcrcon". Open the env file and paste your Discord bot token, the RCON IP (same as the server ip), and your RCON password (as set in the server.properties file). Make sure the bot program, the env file, your launch script, and server.properties files are in the same folder. 
+Open command prompt and run `pip install mcrcon`. Open the env file and paste your Discord bot token, the RCON IP (same as the server ip), and your RCON password (as set in the server.properties file). Make sure the bot program, the env file, your launch script, and server.properties files are in the same folder. 
   
 That's it! Now just run the bot program! 
