@@ -13,7 +13,7 @@ There are 4 commands that can be used.
 
 # Installation
 ## Setting up the Discord bot
---Do this ONLY IF you are setting this up for the first time!--
+Do this ONLY IF you are setting this up for the first time!
 Go to https://discord.com/developers, and create a new application. Now go to the "Bot" section and build a bot. Head over to the "OAuth2" section, and under it, the "URL Generator" section. Under "Scopes", check the "bot" option. Under "Bot Permissions", select the permissions "Send Messages", "Read Message History". At the very bottom, there will be a "Generated URL". Copy it and add it to your server.
 
 ## Setting up the Minecraft server
