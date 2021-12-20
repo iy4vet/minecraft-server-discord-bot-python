@@ -62,8 +62,10 @@ async def on_message(message):
             await message.channel.send("Server is already down. ")
     if msg.startswith("$check"):
         await message.channel.send("Server running: "+str(running))
+    if msg.startswith("$ip"):
+        server_ip = config['BOT']['SERVER_IP']
+        await message.channel.send("Server IP: "+server_ip)
     if msg.startswith("$help"):
-        await message.channel.send("Use $start to start the server, and $stop to stop it. ")
-        await message.channel.send("Use $check to check the server status. ")
+        await message.channel.send("`$start` starts the server. `$stop` stops it. `$check` checks if the server is running. `$ip` will give you the server IP. ")
 
 mcHost.run(token)
