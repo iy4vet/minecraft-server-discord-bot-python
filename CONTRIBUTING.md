@@ -19,10 +19,7 @@ Do this ONLY IF you are setting this up for the first time!
 Go to https://discord.com/developers, and create a new application. Now go to the "Bot" section and build a bot. Head over to the "OAuth2" section, and under it, the "URL Generator" section. Under "Scopes", check the "bot" option. Under "Bot Permissions", select the permissions "Send Messages", "Read Message History". At the very bottom, there will be a "Generated URL". Copy it and paste it in your browser. Add the bot to your server. 
 
 #### Step-by-step Instructions
-1. Install `poetry`, a python package manager, with pip:
-```shell
-pip install -U poetry
-```
+1. Install `poetry`, a python package manager using these instructions: https://python-poetry.org/docs/#installation
 
 2. Install the necessary dependencies for this project in the root directory with:
 ```shell
