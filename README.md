@@ -12,18 +12,5 @@ There are 5 commands that can be used.
 4. `$ip` will give you the server address. 
 5. `$help` can be used to get information on these commands on Discord.
 
-# Installation
-## Setting up the Discord bot
-Do this ONLY IF you are setting this up for the first time!
-Go to https://discord.com/developers, and create a new application. Now go to the "Bot" section and build a bot. Head over to the "OAuth2" section, and under it, the "URL Generator" section. Under "Scopes", check the "bot" option. Under "Bot Permissions", select the permissions "Send Messages", "Read Message History". At the very bottom, there will be a "Generated URL". Copy it and paste it in your browser. Add the bot to your server. 
-## Setting up the Minecraft server
-If you haven't already, set up your Minecraft server on your machine. Open the "server.properties" file. Change the parameters as shown below:
-1. `rcon.port=25575`
-2. `enable-rcon=true`
-3. `rcon.password=<password>`, where \<password> is the password you wish to use. If you don't see these parameters, simply add them at the bottom of the file. 
-Rename your launch script to "run.bat". 
-
-## Setting up the bot script
-Open command prompt and run `pip install mcrcon`. Open the env file and paste your Discord bot token, the RCON IP (same as the internal server ip), and your RCON password (as set in the server.properties file). Also paste the server address that other players would use to connect in SERVER_IP. If the server address changes, you just need to update the value in the env file. You do not need to restart the program. Make sure the bot program, the env file, your launch script, and server.properties files are in the same folder. 
-  
-That's it! Now just run the bot program! 
+## Contributing and Setup Instructions
+Find out how to set the minecraft server and bot up [here](CONTRIBUTING.md)

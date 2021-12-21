@@ -1,17 +1,18 @@
-import configparser
-import discord
+from dotenv import load_dotenv
 import os
 import threading
 import time
+
+import disnake
 from mcrcon import MCRcon
 
 running = False
-mcHost = discord.Client()
-config = configparser.ConfigParser()
-config.read('env.b')
-token = config['BOT']['BOT_TOKEN']
-rcon_ip = config['RCON']['RCON_IP']
-rcon_pass = config['RCON']['RCON_PASS']
+mcHost = disnake.Client()
+
+load_dotenv(dotenv_path=f"{os.getcwd()}/.env")
+token = os.getenv('BOT_TOKEN')
+rcon_ip = os.getenv('RCON_IP')
+rcon_pass = os.getenv('RCON_PASS')
 
 def server():
     global running
@@ -38,7 +39,7 @@ def shutdown():
 @mcHost.event
 async def on_ready():
     print("Logged in as {0.user}".format(mcHost))
-    await mcHost.change_presence(status=discord.Status.dnd, activity=discord.Activity(type=discord.ActivityType.watching, name="if someone wants to play"))
+    await mcHost.change_presence(status=disnake.Status.dnd, activity=disnake.Activity(type=disnake.ActivityType.watching, name="if someone wants to play"))
 
 @mcHost.event
 async def on_message(message):
@@ -63,7 +64,7 @@ async def on_message(message):
     if msg.startswith("$check"):
         await message.channel.send("Server running: "+str(running))
     if msg.startswith("$ip"):
-        server_ip = config['BOT']['SERVER_IP']
+        server_ip = os.getenv('SERVER_IP')
         await message.channel.send("Server IP: "+server_ip)
     if msg.startswith("$help"):
         await message.channel.send("`$start` starts the server. `$stop` stops it. `$check` checks if the server is running. `$ip` will give you the server IP. ")
