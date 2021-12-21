@@ -1,39 +1,46 @@
-from dotenv import load_dotenv
+import disnake
+import dotenv
 import os
 import threading
 import time
-
-import disnake
+from dotenv import load_dotenv
 from mcrcon import MCRcon
 
 running = False
 mcHost = disnake.Client()
+load_dotenv(dotenv_path=f"{os.getcwd()}/bot.env")
+load_dotenv(dotenv_path=f"{os.getcwd()}/server.properties")
 
-load_dotenv(dotenv_path=f"{os.getcwd()}/.env")
-token = os.getenv('BOT_TOKEN')
-rcon_ip = os.getenv('RCON_IP')
-rcon_pass = os.getenv('RCON_PASS')
+if os.getenv("enable-rcon") != "true":
+    dotenv.set_key("server.properties", "enable-rcon", 'true')
+    print("Rcon was not enabled in your server.properties file. I have enabled it now. ")
+if os.getenv("rcon.port") != "25575":
+    dotenv.set_key("server.properties", "rcon.port", '25575')
+    print("Rcon port was not set to 25575 in your server.properties file. I have changed it now. ")
+    print("If you have any port forward rules for the Rcon port, please change them accordingly. ")
 
 def server():
     global running
     running = True
-    os.system(r"run.bat")
+    print("Server started. ")
+    os.system(os.getenv("start-script"))
     running = False
     time.sleep(1)
     print("Server stopped. ")
 
-def rcon_stop():
-    mcr = MCRcon(rcon_ip, rcon_pass)
+def rcon(cmd):
+    mcr = MCRcon(os.getenv("server-ip"),os.getenv("rcon.password"))
     mcr.connect()
-    mcr.command("execute unless entity @a run stop")
+    result = mcr.command(cmd)
     mcr.disconnect()
+    return result
 
 def shutdown():
-    time.sleep(120)
-    print("Auto shutdown started. ")
+    time.sleep(300)
+    print("Auto shutdown thread started. ")
     while running:
         print("Attempting auto shutdown... ")
-        rcon_stop()
+        rcon("execute unless entity @a run stop")
         time.sleep(180)
 
 @mcHost.event
@@ -49,24 +56,28 @@ async def on_message(message):
             await message.channel.send("Server is already running! ")
         else:
             await message.channel.send("Starting server. ")
-            print("Server started. ")
             start_thread = threading.Thread(target=server)
             stop_thread = threading.Thread(target=shutdown)
             start_thread.start()
             stop_thread.start()
     if msg.startswith("$stop"):
         if running:
-            await message.channel.send("Stopping server. ")
+            await message.channel.send("Attempting server shutdown. ")
             print("Attempting manual shutdown... ")
-            rcon_stop()
+            await message.channel.send(rcon("execute unless entity @a run stop"))
         else:
             await message.channel.send("Server is already down. ")
     if msg.startswith("$check"):
         await message.channel.send("Server running: "+str(running))
     if msg.startswith("$ip"):
-        server_ip = os.getenv('SERVER_IP')
-        await message.channel.send("Server IP: "+server_ip)
+        await message.channel.send("Server IP: "+os.getenv('server-address'))
+    if msg.startswith("$rcon "):
+        if message.author.id == os.getenv('rcon-op'):
+            if running:
+                await message.channel.send("Rcon Response: "+rcon(msg[6:]))
+            else:
+                await message.channel.send("Server is down. Please start the server to execute the command. ")
     if msg.startswith("$help"):
         await message.channel.send("`$start` starts the server. `$stop` stops it. `$check` checks if the server is running. `$ip` will give you the server IP. ")
 
-mcHost.run(token)
+mcHost.run(os.getenv("bot-token"))
