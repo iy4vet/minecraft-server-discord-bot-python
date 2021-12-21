@@ -29,9 +29,16 @@ pip install -U poetry
 poetry install
 ```
 
-3. Create a `.env` and update the [settings](#settings)
+3. Run this command to create a `.env` and then update the [settings](#settings)
+
+Linux/MacOS:
 ```shell
 cp .env.example .env
+```
+
+Windows:
+```shell
+copy .env.example .env
 ```
 
 4. Make sure the bot program, the env file, your launch script, and server.properties files are in the same folder.
