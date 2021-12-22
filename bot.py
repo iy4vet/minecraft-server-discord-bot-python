@@ -15,9 +15,10 @@ if os.getenv("enable-rcon") != "true":
     dotenv.set_key("server.properties", "enable-rcon", 'true')
     print("Rcon was not enabled in your server.properties file. I have enabled it now. ")
 if os.getenv("rcon.port") != "25575":
-    dotenv.set_key("server.properties", "rcon.port", '25575')
+    dotenv.set_key("server.properties", "rcon.port", "25575")
     print("Rcon port was not set to 25575 in your server.properties file. I have changed it now. ")
     print("If you have any port forward rules for the Rcon port, please change them accordingly. ")
+#todo: fix '25575', 'true' apostrophes when overwriting
 
 def server():
     global running
@@ -31,9 +32,8 @@ def server():
 def rcon(cmd):
     mcr = MCRcon(os.getenv("server-ip"),os.getenv("rcon.password"))
     mcr.connect()
-    result = mcr.command(cmd)
+    return mcr.command(cmd)
     mcr.disconnect()
-    return result
 
 def shutdown():
     time.sleep(300)
@@ -71,13 +71,19 @@ async def on_message(message):
         await message.channel.send("Server running: "+str(running))
     if msg.startswith("$ip"):
         await message.channel.send("Server IP: "+os.getenv('server-address'))
+    if msg.startswith("$list"):
+        if running:
+            await message.channel.send(rcon("list"))
+        else:
+            await message.channel.send("Server is down. No players online. ")
     if msg.startswith("$rcon "):
-        if message.author.id == os.getenv('rcon-op'):
+        if message.author.id == int(os.getenv('rcon-op')):
             if running:
                 await message.channel.send("Rcon Response: "+rcon(msg[6:]))
             else:
                 await message.channel.send("Server is down. Please start the server to execute the command. ")
     if msg.startswith("$help"):
-        await message.channel.send("`$start` starts the server. `$stop` stops it. `$check` checks if the server is running. `$ip` will give you the server IP. ")
+        await message.channel.send("`$start` starts the server. `$stop` stops it. `$check` checks if the server is running. `$ip` will give you the server IP. `$list` will list online players. ")
+#todo: merge $check, $ip, $list into $info embed
 
 mcHost.run(os.getenv("bot-token"))
