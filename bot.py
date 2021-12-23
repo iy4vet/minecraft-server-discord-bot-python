@@ -18,7 +18,10 @@ if os.getenv("rcon.port") != "25575":
     dotenv.set_key("server.properties", "rcon.port", "25575")
     print("Rcon port was not set to 25575 in your server.properties file. I have changed it now. ")
     print("If you have any port forward rules for the Rcon port, please change them accordingly. ")
-#todo: fix '25575', 'true' apostrophes when overwriting
+if os.getenv("rcon.password") == "":
+    dotenv.set_key("server.properties", "rcon.password", "adefaultpassword")
+    print("No password was set for Rcon. I have set a default password, though you are free to change it to something else. ")
+#todo: fix apostrophes when overwriting
 
 def server():
     global running
