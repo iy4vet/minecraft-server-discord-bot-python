@@ -24,9 +24,8 @@ Copy it and paste it in your browser. This will allow you to invite your bot to 
 ### Setting up the Minecraft server
 If you haven't already, set up your Minecraft server on your machine as normal. Now go to your `server.properties` file. 
 Change the following values:
-\n`rcon.port=25575`
-\n`enable-rcon=true`
-\nIf you'd like, you can set your own Rcon password. The program will automatically set a password if you leave it blank. 
+1. `rcon.port=25575`
+2. `enable-rcon=true`If you'd like, you can set your own Rcon password. The program will automatically set a password if you leave it blank. 
 
 ### Setting up the Bot variables
 Open the file named `bot.env`. 
