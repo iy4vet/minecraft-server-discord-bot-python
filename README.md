@@ -5,14 +5,12 @@ Do you want a Discord Bot to start your Minecraft server? This program will help
 This script starts your Minecraft server and shuts it down too! It also shuts down the server when it's inactive. 
 
 ## Commands
-There are 7 commands that can be used. 
+There are 5 commands that can be used. 
 1. `$start` will start the Minecraft server if it's not already running. 
-2. `$stop` will shut down the Minecraft server if no players are online. It confirms the shutdown by sending "Stopping the server". 
-3. `$check` will tell you whether the server is running. 
-4. `$ip` will give you the server address. 
-5. `$list` will list all online players. 
-7. `$rcon` will execute the command given after the `$rcon` command. Only usable by the server operator (can be set to any one person). 
-7. `$help` can be used to get information on these commands on Discord.
+2. `$stop` will shut down the Minecraft server if no players are online.  
+3. `$info` will give you the server information. (Previously obtained by the `$check $ip $list` commands)
+4. `$rcon` will execute the command given after the `$rcon ` command. Only usable by the server operator (can be set to any one person). 
+5. `$help` can be used to get information on these commands on Discord.
 
 ## Installation
 Follow these steps: 
@@ -24,10 +22,11 @@ Under "Bot Permissions", select the permissions "Send Messages", "Read Message H
 Copy it and paste it in your browser. This will allow you to invite your bot to your server. 
 
 ### Setting up the Minecraft server
-If you haven't already, set up your Minecraft server on your machine as normal. 
-If you wish to set your own password for Rcon, you are free to do so. However, the program will set a default password if you leave it blank. 
-Please note that this program uses port 25575 for Rcon and will thus modify your `server.properties` file. 
-If you have any port forward rules for Rcon, please set the ports accordingly. 
+If you haven't already, set up your Minecraft server on your machine as normal. Now go to your `server.properties` file. 
+Change the following values:
+\n`rcon.port=25575`
+\n`enable-rcon=true`
+\nIf you'd like, you can set your own Rcon password. The program will automatically set a password if you leave it blank. 
 
 ### Setting up the Bot variables
 Open the file named `bot.env`. 
