@@ -65,28 +65,28 @@ async def on_message(message):
             stop_thread.start()
     if msg.startswith("$stop"):
         if running:
-            await message.channel.send("Attempting server shutdown. ")
             print("Attempting manual shutdown... ")
-            await message.channel.send(rcon("execute unless entity @a run stop"))
+            resp=rcon("execute unless entity @a run stop")
+            if resp != "":
+                await message.channel.send(resp)
+            else:
+                await message.channel.send("There are players on the server, so I cannot stop it. ")
         else:
             await message.channel.send("Server is already down. ")
-    if msg.startswith("$check"):
-        await message.channel.send("Server running: "+str(running))
-    if msg.startswith("$ip"):
-        await message.channel.send("Server IP: "+os.getenv('server-address'))
-    if msg.startswith("$list"):
+    if msg.startswith("$check") or msg.startswith("$ip") or msg.startswith("$list"):
+        await message.channel.send("This command is deprecated. Please use `$info` for server information. ")#you may delete this command if you wish
+    if msg.startswith("$info"):
+        online = ""
         if running:
-            await message.channel.send(rcon("list"))
+            online=rcon("list")
+        await message.channel.send("Server address: `"+os.getenv("server-address")+"`. \nServer running: "+str(running)+". \n"+online)
+    if msg.startswith("$rcon ") and str(message.author.id) == os.getenv("rcon-op"):
+        if running:
+            await message.channel.send("Rcon: "+rcon(msg[6:]))
         else:
-            await message.channel.send("Server is down. No players online. ")
-    if msg.startswith("$rcon "):
-        if message.author.id == int(os.getenv('rcon-op')):
-            if running:
-                await message.channel.send("Rcon Response: "+rcon(msg[6:]))
-            else:
-                await message.channel.send("Server is down. Please start the server to execute the command. ")
+            await message.channel.send("Please start the server to execute this command. ")
     if msg.startswith("$help"):
-        await message.channel.send("`$start` starts the server. `$stop` stops it. `$check` checks if the server is running. `$ip` will give you the server IP. `$list` will list online players. ")
-#todo: merge $check, $ip, $list into $info embed
+        await message.channel.send("There are 3 commands that are available to use. \nTo start the server, use `$start`. \nTo get server information, use `$info`. \nTo manually stop the server, use `$stop`. This will only stop the server if no players are online. ")
+#todo: $info embed
 
 mcHost.run(os.getenv("bot-token"))
