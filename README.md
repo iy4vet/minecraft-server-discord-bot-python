@@ -5,12 +5,13 @@ Do you want a Discord Bot to start your Minecraft server? This program will help
 This script starts your Minecraft server and shuts it down too! It also shuts down the server when it's inactive. 
 
 ## Commands
-There are 5 commands that can be used. 
+There are 6 commands that can be used. 
 1. `$start` will start the Minecraft server if it's not already running. 
 2. `$stop` will shut down the Minecraft server if no players are online.  
 3. `$info` will give you the server information. (Previously obtained by the `$check $ip $list` commands)
-4. `$rcon` will execute the command given after the `$rcon ` command. Only usable by the server operator (can be set to any one person). 
-5. `$help` can be used to get information on these commands on Discord.
+4. `$ip-check` will check the server address given in `$info`. The bot will try to update the server address on its own. 
+5. `$rcon` will execute the command given after the `$rcon ` command. Only usable by the server operator (can be set to any one person). 
+6. `$help` can be used to get information on these commands on Discord.
 
 ## Installation
 Follow these steps: 
@@ -32,4 +33,4 @@ Open the file named `bot.env`.
 1. Paste your Discord bot token next to `bot-token`. 
 2. Paste the server address that other players would use to connect next to `server-address`. 
 3. Paste the server start script next to `start-script`. (For example, `start-script=java -Xmx2G -Xms512M -jar server.jar`)
-4. Paste the user ID of the account that shall be allowed to execute commands through Rcon next to `rcon-op`. 
+4. Paste the user ID of the account that shall be allowed to execute commands through Rcon next to `server-op`. 
