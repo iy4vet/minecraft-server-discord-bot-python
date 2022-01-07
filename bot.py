@@ -1,3 +1,5 @@
+#https://github.com/nottherectifier
+
 import disnake
 import dotenv
 import os
