@@ -55,8 +55,10 @@ def ping(ip):
         return -1
     if not rcon("list").startswith("There are"):
         return -2
-    return socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect_ex((ip,25565))
-
+    try:
+        return socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect_ex((ip,25565))
+    except:
+        return -3
 def shutdown():
     time.sleep(300)
     print("Auto shutdown thread started. ")
@@ -101,6 +103,7 @@ async def on_message(message):
             online=rcon("list")
         await ctx.send("Server address: `"+os.getenv("server-address")+"`. \nServer running: "+str(running)+". \n"+online)
     if msg == "$ip-check":
+        await ctx.send("I will check the address. ")
         connectcode = ping(os.getenv("server-address"))
         if connectcode == 0:
             await ctx.send("I am able to ping the server at `"+os.getenv("server-address")+"`. \nCheck that the address you set in Minecraft matches this. If it's correct, check your network connection and firewall settings. ")
@@ -121,6 +124,7 @@ async def on_message(message):
     if msg == "$help":
         await ctx.send("There are 4 commands that are available to use. \nTo start the server, use `$start`. \nTo get server information, use `$info`. \nTo manually stop the server, use `$stop`. This will only stop the server if no players are online. \nIf the address given in `$info` does not work, you can do `$ip-check`. This will update the server address if the current one does not work. ")
     if msg.startswith("$ip-set ") and str(message.author.id) == os.getenv("server-op"):
+        await ctx.send("Checking this address. ")
         connectcode = ping(msg[8:])
         if connectcode == 0:
             await ctx.send("This address works. I will update it now. ")
