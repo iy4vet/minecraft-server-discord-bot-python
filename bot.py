@@ -55,7 +55,7 @@ def ping(ip):
         return -1
     if not rcon("list").startswith("There are"):
         return -2
-    return socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect_ex(ip,25565))
+    return socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect_ex((ip,25565))
 
 def shutdown():
     time.sleep(300)
