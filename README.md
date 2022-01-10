@@ -5,13 +5,15 @@ Do you want a Discord Bot to start your Minecraft server? This program will help
 This script starts your Minecraft server and shuts it down too! It also shuts down the server when it's inactive. 
 
 ## Commands
-There are 6 commands that can be used. 
+There are 5 commands that can be used by anyone: 
 1. `$start` will start the Minecraft server if it's not already running. 
 2. `$stop` will shut down the Minecraft server if no players are online.  
 3. `$info` will give you the server information. (Previously obtained by the `$check $ip $list` commands)
 4. `$ip-check` will check the server address given in `$info`. The bot will try to update the server address on its own if the address doesn't work. 
-5. `$rcon` will execute the command given after the `$rcon ` command. Only usable by the server operator (can be set to any one person). 
-6. `$help` can be used to get information on these commands on Discord.
+5. `$help` can be used to get information on these commands on Discord.
+<br />These commands can be used only by the user set in `server-op`: 
+1. `$rcon` will execute the command given after the `$rcon ` command. Only usable by the server operator (can be set to any one person). 
+2. `$ip-set` will take a new server address and check it. If it's valid, the bot will start using that address moving forward (will be reset after restarts). 
 
 ## Installation
 Follow these steps: 
@@ -26,7 +28,7 @@ Copy it and paste it in your browser. This will allow you to invite your bot to 
 If you haven't already, set up your Minecraft server on your machine as normal. Now go to your `server.properties` file. 
 Change the following values:
 1. `rcon.port=25575`
-2. `enable-rcon=true` If you'd like, you can set your own Rcon password. The program will automatically set a password if you leave it blank. 
+2. `enable-rcon=true` <br />If you'd like, you can set your own Rcon password. The program will automatically set a password if you leave it blank. 
 
 ### Setting up the Bot variables
 Open the file named `bot.env`. 
