@@ -13,7 +13,7 @@ This script starts your Minecraft server and shuts it down too! It also shuts do
 5. `$help` can be used to get information on these commands on Discord.
 ### These commands can be used only by the user set in `server-op`: 
 1. `$rcon` will execute the command given after the `$rcon ` command. Only usable by the server operator (can be set to any one person). 
-2. `$ip-set` will take a new server address and check it. If it's valid, the bot will start using that address moving forward (will be reset after restarts). 
+2. `$ip-set` will take a new server address and check it. If it's valid, the bot will start using that address moving forward (will be reset if the bot restarts). 
 
 ## Installation
 Follow these steps: 
