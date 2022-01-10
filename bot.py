@@ -70,7 +70,7 @@ def shutdown():
 @mcHost.event
 async def on_ready():
     print("Logged in as {0.user}".format(mcHost))
-    await mcHost.change_presence(status=disnake.Status.dnd, activity=disnake.Activity(type=disnake.ActivityType.watching, name="if someone wants to play"))
+    await mcHost.change_presence(activity=disnake.Game("$help for help"))
 
 @mcHost.event
 async def on_message(message):
