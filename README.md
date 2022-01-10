@@ -12,7 +12,7 @@ This script starts your Minecraft server and shuts it down too! It also shuts do
 4. `$ip-check` will check the server address given in `$info`. The bot will try to update the server address on its own if the address doesn't work. 
 5. `$help` can be used to get information on these commands on Discord.
 ### These commands can be used only by the user set in `server-op`: 
-1. `$rcon` will execute the command given after the `$rcon` command. 
+1. `$rcon` will execute a Minecraft command. For example, `$rcon time set 0`. The bot will respond with the output, in this case `Rcon: Set the time to 0`. 
 2. `$ip-set` will take a new server address and check it. If it's valid, the bot will start using that address moving forward (will be reset if the bot restarts). 
 
 ## Installation
