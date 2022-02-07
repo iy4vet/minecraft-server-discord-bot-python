@@ -12,24 +12,28 @@ import urllib.request
 from dotenv import load_dotenv
 from mcrcon import MCRcon
 
-running = False
-waitmsg = "The server is either starting up, or shutting down. Please wait a bit, and then try again. "
 mcHost = disnake.Client()
 load_dotenv(dotenv_path=f"{os.getcwd()}/bot.env")
 load_dotenv(dotenv_path=f"{os.getcwd()}/server.properties")
+ops = os.getenv("server-op").split(',')
+running = False
+error = False
+waitmsg = "The server is either starting up, or shutting down. Please wait a bit, and then try again. "
+
 
 if os.getenv("enable-rcon") != "true":
     print("Rcon is not enabled in your server.properties file. Please change enable-rcon to true. ")
-    time.sleep(10)
-    exit
+    error = True
 if os.getenv("rcon.port") != "25575":
     print("Rcon port is not set to 25575 in your server.properties file. Please change rcon.port to 25575. ")
     print("If you have any port forward rules for the Rcon port, please change them accordingly. ")
+    error = True
+if os.getenv("rcon.password") == "":
+    print("No password was set for Rcon. Please set a password for Rcon under rcon.password")
+    error = True
+if error:
     time.sleep(10)
     exit
-if os.getenv("rcon.password") == "":
-    dotenv.set_key("server.properties", "rcon.password", ''.join(random.SystemRandom().choice(string.ascii_letters + string.digits) for _ in range(10)))
-    print("No password was set for Rcon. I have set a random password, though you are free to change it to something else. ")
 
 def server():
     global running
@@ -119,11 +123,20 @@ async def on_message(message):
                 await ctx.send("New IP: "+extip)
                 os.environ["server-address"] = extip
             else:
-                await ctx.send("I was unable to get a new working address for the server. Please ask <@"+os.getenv("server-op")+"> or the bot host to update the `server-address` field and restart the bot, or use the `$ip-set` command. ")
+                opping = ""
+                for i in ops:
+                    opping = opping + str("<@"+i+"> ")
+                await ctx.send("I was unable to get a new working address for the server. Please ask the bot host to update the `server-address` field and restart the bot. ")
+                await ctx.send("Alternatively, ask "+opping+"to use the $ip-set command to update the server address
                 await ctx.send("However, you may try this address: `"+extip+"`. ")
+    if msg.startswith("$say ") and running:
+        try:
+            await ctx.send(rcon('tellraw @a ["{'+str(await mcHost.fetch_user(message.author.id))+'} '+str(msg[5:])+'"]'))
+        except:
+            pass
     if msg == "$help":
-        await ctx.send("There are 4 commands that are available to use. \nTo start the server, use `$start`. \nTo get server information, use `$info`. \nTo manually stop the server, use `$stop`. This will only stop the server if no players are online. \nIf the address given in `$info` does not work, you can do `$ip-check`. This will update the server address if the current one does not work. ")
-    if msg.startswith("$ip-set ") and str(message.author.id) == os.getenv("server-op"):
+        await ctx.send("There are 4 commands that are available to use. \nTo start the server, use `$start`. \nTo get server information, use `$info`. \nTo manually stop the server, use `$stop`. This will only stop the server if no players are online. \n $say <message> will send your message in the Minecraft server if it's running. \nIf the address given in `$info` does not work, you can do `$ip-check`. This will update the server address if the current one does not work. ")
+    if msg.startswith("$ip-set ") and str(message.author.id) in ops:
         await ctx.send("Checking this address. ")
         connectcode = ping(msg[8:])
         if connectcode == 0:
@@ -135,7 +148,7 @@ async def on_message(message):
             await ctx.send(waitmsg)
         else:
             await ctx.send("This address doesn't work. I will continue with the old one. ")
-    if msg.startswith("$rcon ") and str(message.author.id) == os.getenv("server-op"):
+    if msg.startswith("$rcon ") and str(message.author.id) in ops:
         if running:
             await ctx.send("Rcon: "+rcon(msg[6:]))
         else:

@@ -5,13 +5,14 @@ Do you want a Discord Bot to start your Minecraft server? This program will help
 This script starts your Minecraft server and shuts it down too! It also shuts down the server when it's inactive. 
 
 ## Commands
-### There are 5 commands that can be used by anyone: 
+### There are 6 commands that can be used by anyone: 
 1. `$start` will start the Minecraft server if it's not already running. 
 2. `$stop` will shut down the Minecraft server if no players are online.  
 3. `$info` will give you the server information. 
 4. `$ip-check` will check the server address given in `$info`. The bot will try to update the server address on its own if the address doesn't work. 
-5. `$help` can be used to get information on these commands on Discord.
-### These commands can be used only by the user set in `server-op`: 
+5. `$say` will send a message in the Minecraft server if it's running. The message will appear as `{username#0000} message`. Note that this is only one-way and that Minecraft to Discord chat integration hasn't been implemented yet. 
+6. `$help` can be used to get information on these commands on Discord.
+### These commands can be used only by the user(s) set in `server-op`: 
 1. `$rcon` will execute a Minecraft command. For example, `$rcon time set 0`. The bot will respond with the output, in this case `Rcon: Set the time to 0`. 
 2. `$ip-set` will take a new server address and check it. If it's valid, the bot will start using that address moving forward (will be reset if the bot restarts). 
 
@@ -29,14 +30,14 @@ If you haven't already, set up your Minecraft server on your machine as normal. 
 Change the following values:
 - `rcon.port=25575`
 - `enable-rcon=true`
-- If you'd like, you can set your own Rcon password. The program will automatically set a password if you leave it blank. 
+- `rcon.password=<password`, where <password> is the password you wish to use for Rcon. 
 
 ### Setting up the Bot variables
 Open the file named `bot.env`. 
 1. Paste your Discord bot token next to `bot-token`. 
 2. Paste the server address that other players would use to connect next to `server-address`. 
 3. Paste the server start script next to `start-script`. (For example, `start-script=java -Xmx2G -Xms512M -jar server.jar`)
-4. Paste the user ID of the account that shall be allowed to execute commands through Rcon next to `server-op`. 
+4. Paste the user ID of the account that shall be allowed to execute commands through Rcon next to `server-op`. If you want multiple users, separate each one with `,`. For example: `server-op=123,456,243,632`. Do not use spaces. 
 
 ### Important notes
 1. Given that Minecraft connects to port 25565 by default, this program also pings `server-address` on port 25565. If you forward any port OTHER than 25565, your address would look something like `xxx.xxx.xxx.xxx:port`. This CAN be set in `bot.env`, however it WILL NOT WORK with the `$ip-check` function! You may choose, then, to change the port you're forwarding, or remove the code for this function by deleting all code within `if msg == "$ip-check":`, including the if condition itself. 
