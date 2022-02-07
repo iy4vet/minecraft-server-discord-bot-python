@@ -127,7 +127,7 @@ async def on_message(message):
                 for i in ops:
                     opping = opping + str("<@"+i+"> ")
                 await ctx.send("I was unable to get a new working address for the server. Please ask the bot host to update the `server-address` field and restart the bot. ")
-                await ctx.send("Alternatively, ask "+opping+"to use the $ip-set command to update the server address
+                await ctx.send("Alternatively, ask "+opping+"to use the $ip-set command to update the server address")
                 await ctx.send("However, you may try this address: `"+extip+"`. ")
     if msg.startswith("$say ") and running:
         try:
