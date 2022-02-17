@@ -155,7 +155,7 @@ async def say(inter,message:str):
 
 @mcBot.slash_command(description="Get help on all commands")
 async def help(inter):
-    await inter.response.send_message("There are 5 commands that are available to use. \nTo start the server, use `/start`. \nTo get server information, use `/info`. \nTo manually stop the server, use `/stop`. This will only stop the server if no players are online. \nTo send a message in the server, use `/say \"<message>\"`. \nIf the address given in `/info` does not work, you can do `/ipcheck`. This will update the server address if the current one does not work. ")
+    await inter.response.send_message("There are 5 commands that are available to use. \nTo start the server, use `/start`. \nTo get server information, use `/info`. \nTo manually stop the server, use `/stop`. This will only stop the server if no players are online. \nTo send a message in the server, use `/say <message>`. \nIf the address given in `/info` does not work, you can do `/ipcheck`. This will update the server address if the current one does not work. ")
 
 @mcBot.slash_command(description="Sets a new address for the Minecraft server")
 async def ipset(inter,address:str,port:int = serverport):
