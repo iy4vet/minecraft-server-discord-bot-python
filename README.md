@@ -10,10 +10,10 @@ This script starts your Minecraft server and shuts it down too! It also shuts do
 2. `/stop` will shut down the Minecraft server if no players are online.  
 3. `/info` will give you the server information. 
 4. `/ipcheck` will check the server address given in `$info`. The bot will try to update the server address on its own if the address doesn't work. 
-5. `/say` will send a message in the Minecraft server if it's running. The message will appear as `{username#0000} message`. Note that this is only one-way and that Minecraft to Discord chat integration hasn't been implemented yet. 
+5. `/say <message>` will send a message in the Minecraft server if it's running. The message will appear as `{username#0000} <message>`. Note that this is only one-way and that Minecraft to Discord chat integration hasn't been implemented yet. 
 6. `/help` can be used to get information on these commands on Discord.
 ### These commands can be used only by the user(s) set in `server-op`: 
-1. `/cmd` will execute a Minecraft command. For example, `$rcon time set 0`. The bot will respond with the output, in this case `Rcon: Set the time to 0`. 
+1. `/cmd` will execute a Minecraft command. For example, `/cmd time set 0`. The bot will respond with the output, in this case `Rcon: Set the time to 0`. 
 2. `/ipset` will take a new server address and check it. If it's valid, the bot will start using that address moving forward (will be reset if the bot restarts). 
 
 ## Installation
