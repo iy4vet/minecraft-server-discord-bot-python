@@ -172,13 +172,14 @@ async def ipset(inter,address:str,port:int = serverport):
         return
     await inter.response.defer()
     connectcode = ping(address,port)
+    if serverport != port:
+        serverport = port
     if connectcode == 0:
         await inter.edit_original_message(content="This address works. I will update it now. ")
         if port == 25565:
             os.environ["server-address"] = address
         else:
             os.environ["server-address"] = address + ":" + port
-            serverport = port
     elif connectcode == -1:
         await inter.edit_original_message(content="The server is not running. Please start the server so I can check that this address works. ")
     elif connectcode == -2:
