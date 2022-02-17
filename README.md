@@ -29,7 +29,7 @@ Copy it and paste it in your browser. This will allow you to invite your bot to 
 If you haven't already, set up your Minecraft server on your machine as normal. Now go to your `server.properties` file. 
 Change the following values:
 - `enable-rcon=true`
-- `rcon.password=<password`, where <password> is the password you wish to use for Rcon. 
+- `rcon.password=<password>`, where <password> is the password you wish to use for Rcon. 
 
 ### Setting up the Bot variables
 Open the file named `bot.env`. 
