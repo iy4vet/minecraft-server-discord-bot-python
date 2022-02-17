@@ -13,7 +13,6 @@ from mcrcon import MCRcon
 
 load_dotenv(dotenv_path=f"{os.getcwd()}/bot.env")
 load_dotenv(dotenv_path=f"{os.getcwd()}/server.properties")
-waitmsg = "The server is either starting up, or shutting down. Please wait a bit, and then try again. "
 running = False
 error = False
 try:
@@ -52,7 +51,7 @@ def rcon(cmd):
         return resp
     except ConnectionRefusedError:
         print("Rcon unsuccessful: Server in start/stop state. ")
-        return (waitmsg)
+        return ("The server is either starting up, or shutting down. Please wait a bit, and then try again. ")
 
 def ping(ip,port):
     if not running:
@@ -64,8 +63,8 @@ def ping(ip,port):
     try:
         print("Pinging! ")
         return socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect_ex((ip,port))
-    except:
-        print("Ping failed: Sockets error. ")
+    except socket.gaierror:
+        print("Ping failed: Address unresolvable. ")
         return -3
 
 def shutdown():
@@ -122,7 +121,7 @@ async def ipcheck(inter):
     elif connectcode == -1:
         await inter.edit_original_message(content="The server is not running. Please start the server to check the address. ")
     elif connectcode == -2:
-        await inter.edit_original_message(waitmsg)
+        await inter.edit_original_message(content="The server is either starting up, or shutting down. Please wait a bit, and then try again. ")
     else:
         extip = urllib.request.urlopen('https://ident.me').read().decode('utf8')
         connectcode = ping(extip,serverport)
@@ -183,9 +182,13 @@ async def ipset(inter,address:str,port:int = serverport):
     elif connectcode == -1:
         await inter.edit_original_message(content="The server is not running. Please start the server so I can check that this address works. ")
     elif connectcode == -2:
-        await inter.edit_original_message(content=waitmsg)
+        await inter.edit_original_message(content="The server is either starting up, or shutting down. Please wait a bit, and then try again. ")
+    elif connectcode == -3:
+        await inter.edit_original_message(content="This address couldn't be resolved. This is probably because the URL/IP doesn't exist. ")
+    elif connectcode == 10060:
+        await inter.edit_original_message(content="This address timed out when pinged. This is probably due to the port not being forwarded. ")
     else:
-        await inter.edit_original_message(content="This address doesn't work. I will continue with the old one. ")
+        await inter.edit_original_message(content="This address doesn't work. I cannot pin the error down. ")
 
 @mcBot.slash_command(description="Executes a Minecraft command on the Minecraft server")
 async def cmd(inter,command:str):
