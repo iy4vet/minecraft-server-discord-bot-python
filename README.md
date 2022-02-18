@@ -1,6 +1,5 @@
 # Overview
 Do you want a Discord Bot to start your Minecraft server? This program will help you do just that!
-[download]: #download
 
 ## Features
 This script starts your Minecraft server and shuts it down too! It also shuts down the server when it's inactive. 
