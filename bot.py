@@ -147,6 +147,11 @@ async def say(inter,message:str):
     if not rcon("list").startswith("There are"):
         await inter.edit_original_message(content="Server is not running. ")
         return
+    try:
+        await inter.edit_original_message(content=rcon('tellraw @a ["{'+str(await mcBot.fetch_user(inter.author.id))+'} '+message+'"]'))
+        return
+    except disnake.errors.HTTPException:
+        pass
     for channelid in os.getenv("chat-channel-id").split(","):
         channel = mcBot.get_channel(int(channelid))
         exist = False
@@ -159,7 +164,6 @@ async def say(inter,message:str):
         for webhook in webhooks:
             await webhook.send(str(message), username=inter.author.name, avatar_url=inter.author.avatar)
     await inter.edit_original_message(content="Sent! ")
-    print(rcon('tellraw @a ["{'+str(await mcBot.fetch_user(inter.author.id))+'} '+message+'"]'))
 
 @mcBot.slash_command(description="Get help on all commands")
 async def help(inter):
@@ -230,6 +234,11 @@ async def on_message(message):
         await msg.delete()
         return
     await message.delete()
+    try:
+        await message.channel.send(content=rcon('tellraw @a ["{'+str(await mcBot.fetch_user(message.author.id))+'} '+message+'"]'))
+        return
+    except disnake.errors.HTTPException:
+        pass
     for channelid in os.getenv("chat-channel-id").split(","):
         channel = mcBot.get_channel(int(channelid))
         exist = False
