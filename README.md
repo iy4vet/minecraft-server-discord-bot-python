@@ -1,8 +1,8 @@
 # Overview
-Do you want a Discord Bot to start your Minecraft server? This program will help you do just that!
+Do you want a Discord Bot to start and manage your Minecraft server? This program will help you do just that!
 
 ## Features
-This script starts your Minecraft server and shuts it down too! It also shuts down the server when it's inactive. 
+This program can start your Minecraft server and shut it down when inactive. It also shuts it down if no players are online upon manual request. You can get server information, such as the server address and online players. It is also capable of getting a new server address if the old one breaks for whatever reason. It also has Discord-Minecraft chat integration with support for dedicated channels. It will sync the chat across all channels configured for the integration. 
 
 ## Commands
 ### There are 6 commands that can be used by anyone: 
@@ -10,11 +10,11 @@ This script starts your Minecraft server and shuts it down too! It also shuts do
 2. `/stop` will shut down the Minecraft server if no players are online.  
 3. `/info` will give you the server information. 
 4. `/ipcheck` will check the server address given in `$info`. The bot will try to update the server address on its own if the address doesn't work. 
-5. `/say <message>` will send a message in the Minecraft server if it's running. The message will appear as `{username#0000} <message>`. Note that this is only one-way and that Minecraft to Discord chat integration hasn't been implemented yet. *This command is still available, but its use is discouraged in favour of a new feature. *
+5. `/say <message>` will send a message in the Minecraft server if it's running. The message will appear as `{username#0000} <message>`. Note that this is only one-way and that Minecraft to Discord chat integration hasn't been implemented yet. **This command is still usable, but is discouraged in favour of a new and better feature.**
 6. `/help` can be used to get information on these commands on Discord.
 ### These commands can be used only by the user(s) set in `server-op`: 
-1. `/cmd` will execute a Minecraft command. For example, `/cmd time set 0`. The bot will respond with the output, in this case `Rcon: Set the time to 0`. 
-2. `/ipset` will take a new server address and check it. If it's valid, the bot will start using that address moving forward (will be reset if the bot restarts). 
+1. `/cmd <command>` will execute a Minecraft command. For example, `/cmd time set 0`. The bot will respond with the output, in this case `Rcon: Set the time to 0`. 
+2. `/ipset <address> <port>` will take a new server address and check it. If it's valid, the bot will start using that address moving forward. Providing a new port is optional: the bot defaults to the current server port. This will be reset when the bot restarts. 
 
 ## Installation
 Follow these steps: 
@@ -22,7 +22,7 @@ Follow these steps:
 #### Do this part ONLY IF you are setting this up for the first time! If you set your bot up previously but are using slash commands on it for the first time, please redo the steps carefully. 
 Go to [the Discord Developer site](https://discord.com/developers/), and create a new application. Now go to the "Bot" section and build a bot. 
 Head over to the "OAuth2" section, and under it, the "URL Generator" section. Under "Scopes", check `bot` and `applications.commands`.
-Under "Bot Permissions", select the permissions "Send Messages", "Read Message History". At the very bottom, there will be a "Generated URL".
+Under "Bot Permissions", select the permission "Administrator". At the very bottom, there will be a "Generated URL".
 Copy it and paste it in your browser. This will allow you to invite your bot to your server. 
 
 ### Setting up the Minecraft server
@@ -31,6 +31,9 @@ Change the following values:
 - `enable-rcon=true`
 - `rcon.password=<password>`, where <password> is the password you wish to use for Rcon. 
 
+### Setting up your Discord server
+Create a new channel for the Discord-Minecraft chat integration. Copy its ID and paste it under `chat-channel-id`. If you want multiple channels, simply separate each ID with `,`, similar to `server-op`. Do not use spaces. 
+ 
 ### Setting up the Bot variables
 Open the file named `bot.env`. 
 1. Paste your Discord bot token next to `bot-token`. 
