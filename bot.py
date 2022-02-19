@@ -13,6 +13,7 @@ from mcrcon import MCRcon
 
 load_dotenv(dotenv_path=f"{os.getcwd()}/bot.env")
 load_dotenv(dotenv_path=f"{os.getcwd()}/server.properties")
+mcBot = commands.Bot(sync_commands_debug=True)
 running = False
 error = False
 try:
@@ -28,10 +29,6 @@ if os.getenv("rcon.password") == "":
 if error:
     time.sleep(10)
     exit(code=0)
-
-mcBot = commands.Bot(
-    sync_commands_debug=True,
-)
 
 def server():
     global running
@@ -147,10 +144,22 @@ async def say(inter,message:str):
     message: The message to be sent
     """
     await inter.response.defer(ephemeral=True)
-    try:
-        await inter.edit_original_message(content=rcon('tellraw @a ["{'+str(await mcBot.fetch_user(inter.author.id))+'} '+message+'"]'))
-    except disnake.errors.HTTPException: 
-        await inter.edit_original_message(content="Sent! ")
+    if not rcon("list").startswith("There are"):
+        await inter.edit_original_message(content="Server is not running. ")
+        return
+    for channelid in os.getenv("chat-channel-id").split(","):
+        channel = mcBot.get_channel(int(channelid))
+        exist = False
+        webhooks = await channel.webhooks()
+        for webhook in webhooks:
+            if webhook.name == "MCBotChat":
+                exist = True
+        if not exist:
+            await channel.create_webhook(name="MCBotChat")
+        for webhook in webhooks:
+            await webhook.send(str(message), username=inter.author.name, avatar_url=inter.author.avatar)
+    await inter.edit_original_message(content="Sent! ")
+    print(rcon('tellraw @a ["{'+str(await mcBot.fetch_user(inter.author.id))+'} '+message+'"]'))
 
 @mcBot.slash_command(description="Get help on all commands")
 async def help(inter):
@@ -207,5 +216,31 @@ async def cmd(inter,command:str):
         await inter.edit_original_message(content="Rcon: "+rcon(command))
     else:
         await inter.edit_original_message(content="Please start the server to execute this command. ")
+
+@mcBot.event
+async def on_message(message):
+    if message.author.bot:
+        return  
+    if str(message.channel.id) not in os.getenv("chat-channel-id").split(","):
+        return
+    if not rcon("list").startswith("There are"):
+        await message.delete()
+        msg = await message.channel.send("Server is not running. ")
+        await asyncio.sleep(5)
+        await msg.delete()
+        return
+    await message.delete()
+    for channelid in os.getenv("chat-channel-id").split(","):
+        channel = mcBot.get_channel(int(channelid))
+        exist = False
+        webhooks = await channel.webhooks()
+        for webhook in webhooks:
+            if webhook.name == "MCBotChat":
+                exist = True
+        if not exist:
+            await channel.create_webhook(name="MCBotChat")
+        for webhook in webhooks:
+            await webhook.send(str(message.content), username=message.author.name, avatar_url=message.author.avatar)
+    print(rcon('tellraw @a ["{'+str(await mcBot.fetch_user(message.author.id))+'} '+message.content+'"]'))
 
 mcBot.run(os.getenv("bot-token"))
