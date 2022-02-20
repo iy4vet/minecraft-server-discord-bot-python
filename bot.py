@@ -235,7 +235,7 @@ async def on_message(message):
         return
     await message.delete()
     try:
-        await message.channel.send(content=rcon('tellraw @a ["{'+str(await mcBot.fetch_user(message.author.id))+'} '+message+'"]'))
+        await message.channel.send(content=rcon('tellraw @a ["{'+str(await mcBot.fetch_user(message.author.id))+'} '+message.content+'"]'))
         return
     except disnake.errors.HTTPException:
         pass
