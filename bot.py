@@ -4,7 +4,6 @@ import asyncio
 import disnake
 import os
 import socket
-import threading
 import time
 import urllib.request
 from disnake.ext import commands
@@ -16,6 +15,7 @@ load_dotenv(dotenv_path=f"{os.getcwd()}/server.properties")
 mcBot = commands.Bot(sync_commands_debug=True)
 running = False
 error = False
+
 try:
     serverport = os.getenv("server-address").split(":")[1]
 except IndexError:
@@ -30,21 +30,12 @@ if error:
     time.sleep(10)
     exit(code=0)
 
-def server():
-    global running
-    running = True
-    print("Server started. ")
-    os.system(os.getenv("start-script"))
-    running = False
-    print("Server stopped. ")
-
 def rcon(cmd):
     mcr = MCRcon(os.getenv("server-ip"),os.getenv("rcon.password"),port=int(os.getenv("rcon.port")))
     try:
         mcr.connect()
         resp = mcr.command(cmd)
         mcr.disconnect()
-        print("Rcon successful! ")
         return resp
     except ConnectionRefusedError:
         print("Rcon unsuccessful: Server in start/stop state. ")
@@ -58,19 +49,58 @@ def ping(ip,port):
         print("Ping failed: Server in start/stop state. ")
         return -2
     try:
-        print("Pinging! ")
         return socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect_ex((ip,port))
     except socket.gaierror:
         print("Ping failed: Address unresolvable. ")
         return -3
 
-def shutdown():
-    time.sleep(300)
-    print("Auto shutdown thread started. ")
+async def server():
+    global running
+    running = True
+    print("Server started. ")
+    proc = await asyncio.create_subprocess_shell(os.getenv("start-script"),stdout=asyncio.subprocess.PIPE) 
+    while True: 
+        data = await proc.stdout.readline()
+        if not data:
+            break
+        line = data.decode('latin1').rstrip()
+        print(line)
+        asyncio.create_task(on_line(line))
+    running = False
+    print("Server stopped. ")
+
+async def shutdown():
+    print("Auto shutdown thread started. ") 
+    await asyncio.sleep(300)
     while running:
         print("Attempting auto shutdown... ")
         rcon("execute unless entity @a run stop")
-        time.sleep(180)
+        await asyncio.sleep(180)
+
+async def webhook_send(content,uname,avatar):
+    for channelid in os.getenv("chat-channel-id").split(","):
+        channel = mcBot.get_channel(int(channelid))
+        exist = False
+        webhooks = await channel.webhooks()
+        for webhook in webhooks:
+            if webhook.name == "MCBotChat":
+                exist = True
+        if not exist:
+            await channel.create_webhook(name="MCBotChat")
+        for webhook in webhooks:
+            try:
+                await webhook.send(str(content), username=uname, avatar_url=avatar)
+            except disnake.errors.InvalidArgument:
+                pass
+            except disnake.errors.HTTPException:
+                pass
+
+async def on_line(line):
+    try:
+        split = line.split("<",1)[1].split("> ",1)
+        await webhook_send(split[1],split[0],"https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/i/977e8c4f-1c99-46cd-b070-10cd97086c08/d36qrs5-017c3744-8c94-4d47-9633-d85b991bf2f7.png")
+    except IndexError:
+        return
 
 @mcBot.event
 async def on_ready():
@@ -83,10 +113,8 @@ async def start(inter):
     if running:
         await inter.edit_original_message(content="Server is already running! ")
     else:
-        threading.Thread(target=server).start()
-        while (not rcon("list").startswith("There are")) and running:
-            await asyncio.sleep(5)
-        threading.Thread(target=shutdown).start()
+        asyncio.create_task(server())
+        asyncio.create_task(shutdown())
         await inter.edit_original_message(content="Started server. ")
 
 @mcBot.slash_command(description="Attempts to stop the server")
@@ -152,17 +180,7 @@ async def say(inter,message:str):
         return
     except disnake.errors.HTTPException:
         pass
-    for channelid in os.getenv("chat-channel-id").split(","):
-        channel = mcBot.get_channel(int(channelid))
-        exist = False
-        webhooks = await channel.webhooks()
-        for webhook in webhooks:
-            if webhook.name == "MCBotChat":
-                exist = True
-        if not exist:
-            await channel.create_webhook(name="MCBotChat")
-        for webhook in webhooks:
-            await webhook.send(str(message), username=inter.author.name, avatar_url=inter.author.avatar)
+    await webhook_send(message,inter.author.name,inter.author.avatar)
     await inter.edit_original_message(content="Sent! ")
 
 @mcBot.slash_command(description="Get help on all commands")
@@ -227,29 +245,23 @@ async def on_message(message):
         return  
     if str(message.channel.id) not in os.getenv("chat-channel-id").split(","):
         return
+    await message.delete()
     if not rcon("list").startswith("There are"):
-        await message.delete()
         msg = await message.channel.send("Server is not running. ")
         await asyncio.sleep(5)
         await msg.delete()
         return
-    await message.delete()
     try:
+<<<<<<< Updated upstream
         await message.channel.send(content=rcon('tellraw @a ["{'+str(await mcBot.fetch_user(message.author.id))+'} '+message.content+'"]'))
+=======
+        msg = await message.channel.send(rcon('tellraw @a ["{'+str(await mcBot.fetch_user(message.author.id))+'} '+message.content+'"]'))
+        await asyncio.sleep(5)
+        await msg.delete()
+>>>>>>> Stashed changes
         return
     except disnake.errors.HTTPException:
         pass
-    for channelid in os.getenv("chat-channel-id").split(","):
-        channel = mcBot.get_channel(int(channelid))
-        exist = False
-        webhooks = await channel.webhooks()
-        for webhook in webhooks:
-            if webhook.name == "MCBotChat":
-                exist = True
-        if not exist:
-            await channel.create_webhook(name="MCBotChat")
-        for webhook in webhooks:
-            await webhook.send(str(message.content), username=message.author.name, avatar_url=message.author.avatar)
-    print(rcon('tellraw @a ["{'+str(await mcBot.fetch_user(message.author.id))+'} '+message.content+'"]'))
+    await webhook_send(message.content,message.author.name,message.author.avatar)
 
 mcBot.run(os.getenv("bot-token"))
