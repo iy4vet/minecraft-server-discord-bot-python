@@ -2,7 +2,7 @@
 Do you want a Discord Bot to start and manage your Minecraft server? This program will help you do just that!
 
 ## Features
-This program can start your Minecraft server and shut it down when inactive. It also shuts it down if no players are online upon manual request. You can get server information, such as the server address and online players. It is also capable of getting a new server address if the old one breaks for whatever reason. It also has Discord-Minecraft chat integration with support for dedicated channels. It will sync the chat across all channels configured for the integration. 
+This script can start your Minecraft server from a Discord command and will shut it down automatically when inactive! Users can get information about the server such as its address and online players. If the address changes, users can request a new address and the bot will get one automatically! It can also integrate your Discord and Minecraft servers' chats! For the server host, this program works entirely using vanilla methods, meaning you don't have to add any mods to your Minecraft server!
 
 ## Commands
 ### There are 6 commands that can be used by anyone: 
@@ -10,7 +10,7 @@ This program can start your Minecraft server and shut it down when inactive. It 
 2. `/stop` will shut down the Minecraft server if no players are online.  
 3. `/info` will give you the server information. 
 4. `/ipcheck` will check the server address given in `/info`. The bot will try to update the server address on its own if the address doesn't work. 
-5. `/say <message>` will send a message in the Minecraft server if it's running. The message will appear as `{username#0000} <message>`. Note that this is only one-way and that Minecraft to Discord chat integration hasn't been implemented yet. **This command is still usable, but is discouraged in favour of a new and better feature.**
+5. `/say <message>` will send a message in the Minecraft server if it's running. The message will appear as `{username#0000} <message>`. **This command is still usable, but is discouraged in favour of a new and better feature.**
 6. `/help` can be used to get information on these commands on Discord.
 ### These commands can be used only by the user(s) set in `server-op`: 
 1. `/cmd <command>` will execute a Minecraft command. For example, `/cmd time set 0`. The bot will respond with the output, in this case `Rcon: Set the time to 0`. 
@@ -44,3 +44,4 @@ Create a new channel for the Discord-Minecraft chat integration. Copy its ID and
  
 ### Important notes
 - Minecraft connects to port 25565 by default. If you forward any port other than 25565, your address would look something like `xxx.xxx.xxx.xxx:port` since the port must also be specified for Minecraft. This CAN be set in `bot.env`, in which case the program pings the server on `port`. However, if you use port 25565, you may leave the address as `xxx.xxx.xxx.xxx` and the program will use port 25565 automatically. 
+- The Minecraft -> Discord integration works off the fact that messages sent by players show up as `<player> message` in the console. Therefore, any mods that change the chat format are very likely to break this feature. However, it is definitely worth trying such mods since there is a chance that some of them may work normally. 
