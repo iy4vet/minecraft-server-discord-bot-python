@@ -252,13 +252,9 @@ async def on_message(message):
         await msg.delete()
         return
     try:
-<<<<<<< Updated upstream
-        await message.channel.send(content=rcon('tellraw @a ["{'+str(await mcBot.fetch_user(message.author.id))+'} '+message.content+'"]'))
-=======
         msg = await message.channel.send(rcon('tellraw @a ["{'+str(await mcBot.fetch_user(message.author.id))+'} '+message.content+'"]'))
         await asyncio.sleep(5)
         await msg.delete()
->>>>>>> Stashed changes
         return
     except disnake.errors.HTTPException:
         pass
