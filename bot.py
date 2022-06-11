@@ -34,11 +34,11 @@ with open(f"{os.getcwd()}/bot.yaml") as file:
     config = yaml.load(file,Loader=yaml.FullLoader)
 for directory in config['minecraft'].keys():
     if directory.lower() == "logs":
-        print(f"It appears you have a server named '{directory}'! NO! NO! This bot needs its own folder for logging! Please rename your server and restart the bot! Keep in mind that folder names are case insensitive. ")
+        print(f"It appears you have a server named '{directory}'! NO! NO! \nThis bot needs its own folder for logging! Please rename your server and restart the bot! \nKeep in mind that folder names are case insensitive. ")
         error = True
         break
     if directory.lower() == "bungeecord":
-        print(f"It appears you have a server named '{directory}'! NO! NO! If you're using BungeeCord, the bot uses the global default ! Please rename your server and restart the bot! Keep in mind that folder names are case insensitive. ")
+        print(f"It appears you have a server named '{directory}'! NO! NO! \nIf you're using BungeeCord, the bot uses the global default ! Please rename your server and restart the bot! \nKeep in mind that folder names are case insensitive. ")
         error = True
         break
     running[directory] = False
@@ -48,7 +48,7 @@ for directory in config['minecraft'].keys():
         rconpassword[directory] = configs.get("rcon.password").data
         rconport[directory] = int(configs.get("rcon.port").data)
         if configs.get("enable-rcon").data != "true":
-            print(f"You have not set 'enable-rcon' to 'true' in {os.getcwd()}/{directory}/server.properties! You need this enabled for the bot to communicate with the server! Please set this value to 'true' and restart the bot!")
+            print(f"You have not set 'enable-rcon' to 'true' in {os.getcwd()}/{directory}/server.properties! \nYou need this enabled for the bot to communicate with the server! Please set this value to 'true' and restart the bot!")
             error = True
 if error:
     input("Press enter to exit... ")
@@ -131,7 +131,11 @@ async def server_thread(server,user):
     asyncio.create_task(logprint(f"{server} started. "))
     running[server] = True
     nrunning += 1
-    startembed = disnake.Embed(title=config['server_title'],description=f"🖥️ **{server}** started by {user.mention}",color=disnake.Colour.green(),timestamp=datetime.now())
+    startembed = disnake.Embed(
+        title=config['server_title'],
+        description=f"🖥️ **{server}** started by {user.mention}",
+        color=disnake.Colour.green(),
+        timestamp=datetime.now())
     startembed.set_author(name=user,icon_url=user.avatar)
     await webhook_send(server,"","MC Bot",mcBot.user.avatar,embed=startembed)
     os.chdir(f"{origwd}/{server}")
@@ -146,7 +150,11 @@ async def server_thread(server,user):
         asyncio.create_task(on_line(server,line))
     running[server] = False
     nrunning -=1
-    stopembed = disnake.Embed(title=config['server_title'],description=f"🖥️ **{server}** stopped",color=disnake.Colour.red(),timestamp=datetime.now())
+    stopembed = disnake.Embed(
+        title=config['server_title'],
+        description=f"🖥️ **{server}** stopped",
+        color=disnake.Colour.red(),
+        timestamp=datetime.now())
     await webhook_send(server,"","MC Bot",mcBot.user.avatar,embed=stopembed)
     asyncio.create_task(logprint(f"{server} stopped. "))
 
@@ -161,7 +169,7 @@ async def bungee_server():
         data = await proc.stdout.readline()
         if not data:
             break
-        print(data.decode("utf-8").rstrip())
+        asyncio.create_task(logprint(f"BungeeCord: {data.decode('utf-8').strip()}"))
     asyncio.create_task(logprint(f"BungeeCord: BungeeCord stopped. "))
     bungee_running = False
 
@@ -253,13 +261,13 @@ async def start(inter,server:str = commands.Param(autocomplete=autocomp_servers)
     if config['bungeecord'] == 1 and not bungee_running:
         await asyncio.create_task(bungee_server())
     if server not in config['minecraft'].keys():
-        await inter.response.send_message(content="Invalid server name given. Use /infoall to get a list of all servers. Remember that names are case sensitive. ",ephemeral=True)
+        await inter.response.send_message(content="Invalid server name given. Use /info to get a list of all servers. Remember that names are case sensitive. ",ephemeral=True)
         return
     await inter.response.defer()
     if running[server]:
         await inter.edit_original_message(content=f"{server} is already running! ")
     elif nrunning >= config['server_max_concurrent'] and config['server_max_concurrent'] != -1:
-        await inter.edit_original_message(content=f"Maximum concurrent server limit ({config['server_max_concurrent']}) reached. Try `/stopall` to free up some slots. ")
+        await inter.edit_original_message(content=f"Maximum concurrent server limit ({config['server_max_concurrent']}) reached. Try `/stop` to free up some. ")
     else:
         if delay:
             if delay>300 or delay<1:
@@ -267,38 +275,16 @@ async def start(inter,server:str = commands.Param(autocomplete=autocomp_servers)
                 return
             else:
                 asyncio.create_task(server_thread(server,inter.author))
-                await inter.edit_original_message(content=f"Starting {server}. Delaying automatic shutdown by an additional {delay} second(s). Remember that the automatic shutdown starts 5 minutes after the server is joinable without this delay. ")
+                await inter.edit_original_message(content=f"Starting {server}. Delaying automatic shutdown by an additional {delay} second(s). \nRemember that the automatic shutdown starts 5 minutes after the server is joinable without this delay. ")
                 await asyncio.sleep(delay)
         else:
             asyncio.create_task(server_thread(server,inter.author))
             await inter.edit_original_message(content=f"Starting {server}. ")
         asyncio.create_task(shutdown_thread(server))
 
-@mcBot.slash_command(description="Attempts to stop the server")
-async def stop(inter,server:str = commands.Param(autocomplete=autocomp_servers)):
-    """
-    Attempts to stop the server
-
-    Parameters
-    ----------
-    server: The server this is for
-    """
-    asyncio.create_task(loginter("stop",inter.author,{"server":server}))
-    if server not in config['minecraft'].keys():
-        await inter.response.send_message(content="Invalid server name given. Use /infoall to get a list of all servers. Remember that names are case sensitive. ",ephemeral=True)
-        return
-    await inter.response.defer()
-    try:
-        await inter.edit_original_message(content=rcon(server,"execute unless entity @a run stop"))
-        while running[server]:
-            await asyncio.sleep(5)
-        await inter.edit_original_message(content="Stopped the server. ")
-    except disnake.errors.HTTPException:
-        await inter.edit_original_message(content=f"Could not stop the server: {rcon(server,'list')}")
-
 @mcBot.slash_command(description="Attempts to stop all servers")
-async def stopall(inter):
-    asyncio.create_task(loginter("stopall",inter.author,{}))
+async def stop(inter):
+    asyncio.create_task(loginter("stop",inter.author,{}))
     await inter.response.defer()
     resp = ""
     for server in config['minecraft'].keys():
@@ -308,26 +294,9 @@ async def stopall(inter):
         resp = f"{resp}\n{server}: `{res}`"
     await inter.edit_original_message(content=resp)
 
-@mcBot.slash_command(description="Gets server information")
-async def info(inter,server:str = commands.Param(autocomplete=autocomp_servers)):
-    """
-    Gets server information
-
-    Parameters
-    ----------
-    server: The server this is for
-    """
-    asyncio.create_task(loginter("info",inter.author,{"server":server}))
-    if server not in config['minecraft'].keys():
-        await inter.response.send_message(content="Invalid server name given. Use /infoall to get a list of all servers. Remember that names are case sensitive. ",ephemeral=True)
-        return
-    await inter.response.defer()
-    address,port = fetch_address(server)
-    await inter.edit_original_message(content=f"Server address: `{address}:{port}`. \n{rcon(server,'list')}")
-
 @mcBot.slash_command(description="Gets all servers' information")
-async def infoall(inter):
-    asyncio.create_task(loginter("infoall",inter.author,{}))
+async def info(inter):
+    asyncio.create_task(loginter("info",inter.author,{}))
     await inter.response.defer()
     resp = ""
     for server in config['minecraft'].keys():
@@ -350,7 +319,7 @@ async def checkaddress(inter,server:str = commands.Param(autocomplete=autocomp_s
     if config['bungeecord'] == 1 and not bungee_running:
         await asyncio.create_task(bungee_server())
     if server not in config['minecraft'].keys():
-        await inter.response.send_message(content="Invalid server name given. Use /infoall to get a list of all servers. Remember that names are case sensitive. ",ephemeral=True)
+        await inter.response.send_message(content="Invalid server name given. Use /info to get a list of all servers. Remember that names are case sensitive. ",ephemeral=True)
         return
     await inter.response.defer()
     await inter.edit_original_message(content="Pinging current address...")
@@ -377,13 +346,13 @@ async def checkaddress(inter,server:str = commands.Param(autocomplete=autocomp_s
             opping = ""
             for i in config['bot_op']:
                 opping = f"{opping}<@{i}> "
-            await inter.edit_original_message(content=f"I was unable to get a new working address for the server. Please ask the bot host to update the `server-address` field and restart the bot. \nAlternatively, ask {opping}to use the /setaddress command to update the server address. \nHowever, you may try this address: `{extip}`. ")
+            await inter.edit_original_message(content=f"I was unable to get a new working address for the server. Please ask the bot host to update the `server-address` field and restart the bot. \nAlternatively, ask {opping}to use the /setaddress command to update the server address. \nYou can try `{extip}`, but it most likely won't work. ")
     update_yml()
 
 @mcBot.slash_command(description="Get help on all commands")
 async def help(inter):
     asyncio.create_task(loginter("help",inter.author,{}))
-    await inter.response.send_message("There are 6 commands that are available to use. \n`/start`: Starts a server. \n`/info`: Gets server information. \n`/stop`: Stops a server. Only useful if you want to free up server slots. \n`/checkaddress`: Checks whether the given server address works. \n`/infoall`: List all servers and provide information about each of them. \n`/stopall`: Stops all servers. Only useful if you want to free up as many server slots as possible. ")
+    await inter.response.send_message("There are 5 commands that are available to use: \n`/start <server> <delay>`: Starts a server. <delay> is an optional argument that specifes the time in seconds that the server should wait before trying to shut the server down. \n`/info`: List all servers and provide information about each of them. \n`/stop`: Stops all servers. Only useful if the concurrent server limit is reached. \n`/checkaddress <server>`: Checks whether the given server address works. The value of <server> becomes meaningless if BungeeCord is in use, however it still must be given. \n`/help`: Provides help with all available commands. ")
 
 @mcBot.slash_command(description="Sets a new address for the Minecraft server")
 async def setaddress(inter,address:str,port:int,server:str = commands.Param(autocomplete=autocomp_servers)):
@@ -403,7 +372,7 @@ async def setaddress(inter,address:str,port:int,server:str = commands.Param(auto
         await inter.response.send_message(content="You don't have access to this command! ",ephemeral=True)
         return
     if server not in config['minecraft'].keys():
-        await inter.response.send_message(content="Invalid server name given. Use /infoall to get a list of all servers. Remember that names are case sensitive. ",ephemeral=True)
+        await inter.response.send_message(content="Invalid server name given. Use /info to get a list of all servers. Remember that names are case sensitive. ",ephemeral=True)
         return
     await inter.response.defer()
     connectcode = ping(server,address,port)
@@ -442,7 +411,7 @@ async def cmd(inter,command:str,server:str = commands.Param(autocomplete=autocom
         await inter.response.send_message(content="You don't have access to this command! ",ephemeral=True)
         return
     if server not in config['minecraft'].keys():
-        await inter.response.send_message(content="Invalid server name given. Use /infoall to get a list of all servers. Remember that names are case sensitive. ",ephemeral=True)
+        await inter.response.send_message(content="Invalid server name given. Use /info to get a list of all servers. Remember that names are case sensitive. ",ephemeral=True)
         return
     await inter.response.defer()
     await inter.edit_original_message(content=f"Rcon: {rcon(server,command)}")
